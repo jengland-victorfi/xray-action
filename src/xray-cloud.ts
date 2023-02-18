@@ -37,6 +37,8 @@ export class XrayCloud implements Xray {
   }
 
   private getBaseUrl(appPath: string): string {
+    // eslint-disable-next-line no-console
+    console.log('this.xrayBaseUrl.href:', this.xrayBaseUrl.href)
     return path.join(this.xrayBaseUrl.href, appPath)
   }
 
