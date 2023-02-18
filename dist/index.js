@@ -547,14 +547,14 @@ exports.XrayCloud = void 0;
 const got_1 = __importDefault(__nccwpck_require__(3061));
 const core = __importStar(__nccwpck_require__(2186));
 const form_data_1 = __importDefault(__nccwpck_require__(4334));
-const path_1 = __importDefault(__nccwpck_require__(1017));
+const url_1 = __nccwpck_require__(7310);
 const utils_1 = __nccwpck_require__(918);
 const xray_utils_1 = __nccwpck_require__(7249);
 class XrayCloud {
     constructor(xrayOptions, xrayImportOptions) {
         this.xrayOptions = xrayOptions;
         this.xrayImportOptions = xrayImportOptions;
-        this.xrayBaseUrl = new URL('https://xray.cloud.getxray.app');
+        this.xrayBaseUrl = new url_1.URL('https://xray.cloud.getxray.app');
         this.token = '';
         // XrayCloud requires to authenticate with the given credentials first
         this.requiresAuth = true;
@@ -569,7 +569,8 @@ class XrayCloud {
         }
     }
     getBaseUrl(appPath) {
-        return path_1.default.join(this.xrayBaseUrl.href, appPath);
+        core.info(`----> base url: ${this.xrayBaseUrl}`);
+        return `${this.xrayBaseUrl.href}${appPath}`;
     }
     auth() {
         return __awaiter(this, void 0, void 0, function* () {
