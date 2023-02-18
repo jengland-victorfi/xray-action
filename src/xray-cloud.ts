@@ -2,7 +2,7 @@ import {XrayImportOptions, XrayOptions} from './processor'
 import got from 'got'
 import * as core from '@actions/core'
 import FormData from 'form-data'
-import path from 'path'
+import { URL } from 'url';
 import {doFormDataRequest} from './utils'
 import {
   createSearchParams,
@@ -37,9 +37,8 @@ export class XrayCloud implements Xray {
   }
 
   private getBaseUrl(appPath: string): string {
-    // eslint-disable-next-line no-console
-    core.info(`ℹ️ base url: ${this.xrayBaseUrl}`)
-    return path.join(this.xrayBaseUrl.href, appPath)
+    core.info(`----> base url: ${this.xrayBaseUrl}`)
+    return `${this.xrayBaseUrl.href}${appPath}`
   }
 
   async auth(): Promise<void> {
