@@ -2,6 +2,7 @@ import {XrayImportOptions, XrayOptions} from './processor'
 import got from 'got'
 import * as core from '@actions/core'
 import FormData from 'form-data'
+import path from 'path'
 import {doFormDataRequest} from './utils'
 import {
   createSearchParams,
@@ -35,9 +36,13 @@ export class XrayCloud implements Xray {
     }
   }
 
+  private getBaseUrl(appPath: string): string {
+    return path.join(this.xrayBaseUrl.href, appPath)
+  }
+
   async auth(): Promise<void> {
     const authenticateResponse = await got.post<string>(
-      `${this.xrayBaseUrl.href}/api/v2/authenticate`,
+      this.getBaseUrl('/api/v2/authenticate'),
       {
         json: {
           client_id: `${this.xrayOptions.username}`,
@@ -111,13 +116,14 @@ export class XrayCloud implements Xray {
         )
       }
 
-      core.debug(
-        `Using multipart endpoint: ${this.xrayBaseUrl.href}/api/v2/import/execution${format}/multipart`
+      const multipart_endpoint = this.getBaseUrl(
+        '/api/v2/import/execution${format}/multipart'
       )
+      core.debug(`Using multipart endpoint: ${multipart_endpoint}`)
       const importResponse = await doFormDataRequest(form, {
         protocol: this.protocol(),
         host: this.xrayBaseUrl.host,
-        path: `${this.xrayBaseUrl.pathname}/api/v2/import/execution${format}/multipart`,
+        path: multipart_endpoint,
         headers: {Authorization: `Bearer ${this.token}`}
       })
       try {
@@ -131,7 +137,7 @@ export class XrayCloud implements Xray {
         return ''
       }
     } else {
-      const endpoint = `${this.xrayBaseUrl.href}/api/v2/import/execution${format}`
+      const endpoint = this.getBaseUrl(`/api/v2/import/execution${format}`)
       core.debug(`Using endpoint: ${endpoint}`)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

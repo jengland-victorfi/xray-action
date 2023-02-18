@@ -547,6 +547,7 @@ exports.XrayCloud = void 0;
 const got_1 = __importDefault(__nccwpck_require__(3061));
 const core = __importStar(__nccwpck_require__(2186));
 const form_data_1 = __importDefault(__nccwpck_require__(4334));
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const utils_1 = __nccwpck_require__(918);
 const xray_utils_1 = __nccwpck_require__(7249);
 class XrayCloud {
@@ -567,9 +568,12 @@ class XrayCloud {
             return 'https:';
         }
     }
+    getBaseUrl(appPath) {
+        return path_1.default.join(this.xrayBaseUrl.href, appPath);
+    }
     auth() {
         return __awaiter(this, void 0, void 0, function* () {
-            const authenticateResponse = yield got_1.default.post(`${this.xrayBaseUrl.href}/api/v2/authenticate`, {
+            const authenticateResponse = yield got_1.default.post(this.getBaseUrl('/api/v2/authenticate'), {
                 json: {
                     client_id: `${this.xrayOptions.username}`,
                     client_secret: `${this.xrayOptions.password}`
@@ -621,11 +625,12 @@ class XrayCloud {
                         filepath: 'testInfo.json'
                     });
                 }
-                core.debug(`Using multipart endpoint: ${this.xrayBaseUrl.href}/api/v2/import/execution${format}/multipart`);
+                const multipart_endpoint = this.getBaseUrl('/api/v2/import/execution${format}/multipart');
+                core.debug(`Using multipart endpoint: ${multipart_endpoint}`);
                 const importResponse = yield (0, utils_1.doFormDataRequest)(form, {
                     protocol: this.protocol(),
                     host: this.xrayBaseUrl.host,
-                    path: `${this.xrayBaseUrl.pathname}/api/v2/import/execution${format}/multipart`,
+                    path: multipart_endpoint,
                     headers: { Authorization: `Bearer ${this.token}` }
                 });
                 try {
@@ -637,7 +642,7 @@ class XrayCloud {
                 }
             }
             else {
-                const endpoint = `${this.xrayBaseUrl.href}/api/v2/import/execution${format}`;
+                const endpoint = this.getBaseUrl(`/api/v2/import/execution${format}`);
                 core.debug(`Using endpoint: ${endpoint}`);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const importResponse = yield got_1.default.post(endpoint, {
