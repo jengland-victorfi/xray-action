@@ -568,13 +568,16 @@ class XrayCloud {
             return 'https:';
         }
     }
-    getBaseUrl(appPath) {
-        core.info(`----> base url: ${this.xrayBaseUrl}`);
-        return `${this.xrayBaseUrl.href}${appPath}`;
+    getXrayPath(appPath) {
+        // remove leading slashes
+        const endpoint = appPath.replace(/^\/+/, '');
+        // remove trailing slashes
+        const baseUrlNoTrailingSlash = this.xrayBaseUrl.href.replace(/\/+$/, '');
+        return `${baseUrlNoTrailingSlash}/${endpoint}`;
     }
     auth() {
         return __awaiter(this, void 0, void 0, function* () {
-            const authenticateResponse = yield got_1.default.post(this.getBaseUrl('/api/v2/authenticate'), {
+            const authenticateResponse = yield got_1.default.post(this.getXrayPath('/api/v2/authenticate'), {
                 json: {
                     client_id: `${this.xrayOptions.username}`,
                     client_secret: `${this.xrayOptions.password}`
@@ -626,7 +629,7 @@ class XrayCloud {
                         filepath: 'testInfo.json'
                     });
                 }
-                const multipart_endpoint = this.getBaseUrl('/api/v2/import/execution${format}/multipart');
+                const multipart_endpoint = this.getXrayPath('/api/v2/import/execution${format}/multipart');
                 core.debug(`Using multipart endpoint: ${multipart_endpoint}`);
                 const importResponse = yield (0, utils_1.doFormDataRequest)(form, {
                     protocol: this.protocol(),
@@ -643,7 +646,7 @@ class XrayCloud {
                 }
             }
             else {
-                const endpoint = this.getBaseUrl(`/api/v2/import/execution${format}`);
+                const endpoint = this.getXrayPath(`/api/v2/import/execution${format}`);
                 core.debug(`Using endpoint: ${endpoint}`);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const importResponse = yield got_1.default.post(endpoint, {
