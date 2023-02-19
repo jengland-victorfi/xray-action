@@ -36,14 +36,21 @@ export class XrayCloud implements Xray {
     }
   }
 
-  private getBaseUrl(appPath: string): string {
-    core.info(`----> base url: ${this.xrayBaseUrl}`)
-    return `${this.xrayBaseUrl.href}${appPath}`.replace('//', '/')
+  private static getBaseUrl(appPath: string): string {
+    if (!appPath.startsWith('/'))
+      throw new Error(
+        `Invalid appPath: ${appPath} must start with a trailing slash`
+      )
+    const baseUrl = 'https://example.com' // replace with your base URL
+
+    const endpoint = appPath.replace(/^\/+/, '') // remove leading slashes
+    const baseUrlNoTrailingSlash = baseUrl.replace(/\/+$/, '') // remove trailing slashes
+    return `${baseUrlNoTrailingSlash}/${endpoint}`
   }
 
   async auth(): Promise<void> {
     const authenticateResponse = await got.post<string>(
-      this.getBaseUrl('/api/v2/authenticate'),
+      XrayCloud.getBaseUrl('/api/v2/authenticate'),
       {
         json: {
           client_id: `${this.xrayOptions.username}`,
@@ -117,7 +124,7 @@ export class XrayCloud implements Xray {
         )
       }
 
-      const multipart_endpoint = this.getBaseUrl(
+      const multipart_endpoint = XrayCloud.getBaseUrl(
         '/api/v2/import/execution${format}/multipart'
       )
       core.debug(`Using multipart endpoint: ${multipart_endpoint}`)
@@ -138,7 +145,7 @@ export class XrayCloud implements Xray {
         return ''
       }
     } else {
-      const endpoint = this.getBaseUrl(`/api/v2/import/execution${format}`)
+      const endpoint = XrayCloud.getBaseUrl(`/api/v2/import/execution${format}`)
       core.debug(`Using endpoint: ${endpoint}`)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
