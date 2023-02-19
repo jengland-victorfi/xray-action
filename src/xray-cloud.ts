@@ -38,7 +38,7 @@ export class XrayCloud implements Xray {
 
   private getBaseUrl(appPath: string): string {
     core.info(`----> base url: ${this.xrayBaseUrl}`)
-    return `${this.xrayBaseUrl.href}${appPath}`
+    return `${this.xrayBaseUrl.href}${appPath}`.replace('//', '/')
   }
 
   async auth(): Promise<void> {
